@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session
 from utils import calculate_nutrition, get_openai_response
 from database import init_db
+from mongo_db import init_mongodb, save_user, get_user_by_email
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,8 +14,9 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
 
-# Initialize database
+# Initialize databases
 init_db(app)
+init_mongodb()
 
 @app.route('/')
 def index():
@@ -52,6 +54,54 @@ def calculate():
     except Exception as e:
         logging.error(f"Error calculating nutrition: {str(e)}")
         return jsonify({'error': 'Failed to calculate nutrition needs'}), 500
+
+@app.route('/save-user', methods=['POST'])
+def save_user_profile():
+    """Save user profile data to MongoDB."""
+    try:
+        data = request.json
+        
+        # Extract user data
+        user_data = {
+            "full_name": data.get('fullName', ''),
+            "email": data.get('email', ''),
+            "age": int(data.get('age', 0)),
+            "gender": data.get('gender', ''),
+            "height": float(data.get('height', 0)),
+            "weight": float(data.get('weight', 0)),
+            "activity_level": data.get('activityLevel', ''),
+            "dietary_preference": data.get('dietType', ''),
+            "fitness_goal": data.get('goal', ''),
+            "metabolism_type": data.get('metabolicType', ''),
+            "location": data.get('location', ''),
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        # Basic validation
+        if not user_data["email"] or not user_data["full_name"]:
+            return jsonify({'error': 'Email and full name are required'}), 400
+            
+        # Save user data to MongoDB
+        success = save_user(user_data)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'User profile saved successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to save user profile'
+            }), 500
+    
+    except Exception as e:
+        logging.error(f"Error saving user profile: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'An error occurred while saving your profile'
+        }), 500
 
 @app.route('/chat', methods=['POST'])
 def chat():
