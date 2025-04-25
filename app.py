@@ -27,6 +27,13 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 
+# Custom unauthorized handler for API requests
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        return jsonify({'error': 'Unauthorized access. Please log in.'}), 401
+    return redirect(url_for('login'))
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load user from database by ID for Flask-Login."""
@@ -36,7 +43,7 @@ def load_user(user_id):
 def index():
     """Render the main page with the chat interface."""
     if current_user.is_authenticated:
-        return render_template('index.html')
+        return render_template('index_extended.html')
     else:
         return redirect(url_for('login'))
 
@@ -191,6 +198,7 @@ def save_user_profile():
         }), 500
 
 @app.route('/chat', methods=['POST'])
+@login_required
 def chat():
     """Process chat messages and return AI responses."""
     try:
