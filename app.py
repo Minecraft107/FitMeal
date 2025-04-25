@@ -1,8 +1,10 @@
 import os
 import json
 import logging
-from flask import Flask, render_template, request, jsonify
+from datetime import datetime
+from flask import Flask, render_template, request, jsonify, session
 from utils import calculate_nutrition, get_openai_response
+from database import init_db
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -10,6 +12,9 @@ logging.basicConfig(level=logging.DEBUG)
 # Create Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
+
+# Initialize database
+init_db(app)
 
 @app.route('/')
 def index():
