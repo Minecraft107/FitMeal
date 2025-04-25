@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Collect form data
         const formData = {
+            fullName: document.getElementById('fullName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            location: document.getElementById('location').value.trim(),
             height: parseFloat(document.getElementById('height').value),
             weight: parseFloat(document.getElementById('weight').value),
             age: parseInt(document.getElementById('age').value),
@@ -34,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
             dietType: document.getElementById('dietType').value,
             metabolicType: document.querySelector('input[name="metabolicType"]:checked').value
         };
+        
+        // Save user information to MongoDB
+        saveUserProfile(formData);
         
         // Calculate nutrition
         calculateNutrition(formData);
@@ -223,6 +229,32 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show summary section
         nutritionSummary.style.display = 'block';
+    }
+    
+    // Save user profile to MongoDB
+    function saveUserProfile(userData) {
+        fetch('/save-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('User profile saved:', data);
+            // We don't need to notify the user as this happens in the background
+        })
+        .catch(error => {
+            console.error('Error saving user profile:', error);
+            // We don't want to interrupt the user experience even if profile saving fails
+            // The in-memory data will still be available for the current session
+        });
     }
     
     // Toggle form inputs
