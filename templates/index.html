@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Nutrition Assistant</title>
+    
+    <!-- Bootstrap CSS from Replit CDN -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Form Panel (left side) -->
+            <div class="col-md-4 col-lg-3 form-panel p-4 border-end">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-apple-alt me-2"></i> NutriBot
+                </h3>
+                
+                <form id="userInfoForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <h5 class="border-bottom pb-2">Personal Details</h5>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="height" class="form-label">Height (cm)</label>
+                        <input type="number" class="form-control" id="height" required>
+                        <div class="invalid-feedback">Please enter your height</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        <input type="number" class="form-control" id="weight" required>
+                        <div class="invalid-feedback">Please enter your weight</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="age" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="age" required>
+                        <div class="invalid-feedback">Please enter your age</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="male" checked>
+                            <label class="form-check-label" for="genderMale">
+                                Male
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="female">
+                            <label class="form-check-label" for="genderFemale">
+                                Female
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5 class="border-bottom pb-2">Activity & Goals</h5>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="activityLevel" class="form-label">Activity Level</label>
+                        <select class="form-select" id="activityLevel" required>
+                            <option value="sedentary">Sedentary (little or no exercise)</option>
+                            <option value="lightly_active">Lightly Active (1-3 days/week)</option>
+                            <option value="moderately_active">Moderately Active (3-5 days/week)</option>
+                            <option value="very_active">Very Active (6-7 days/week)</option>
+                            <option value="extra_active">Extra Active (twice daily training)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="goal" class="form-label">Goal</label>
+                        <select class="form-select" id="goal" required>
+                            <option value="lose">Lose Weight</option>
+                            <option value="maintain" selected>Maintain Weight</option>
+                            <option value="gain">Gain Muscle</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dietType" class="form-label">Diet Preference</label>
+                        <select class="form-select" id="dietType" required>
+                            <option value="balanced" selected>Balanced</option>
+                            <option value="high_protein">High Protein</option>
+                            <option value="keto">Ketogenic</option>
+                            <option value="low_fat">Low Fat</option>
+                            <option value="vegan">Vegan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5 class="border-bottom pb-2">Metabolic Type</h5>
+                        <small class="text-muted">This affects your macronutrient distribution</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="metabolicType" id="metabolicMixed" value="mixed" checked>
+                            <label class="form-check-label" for="metabolicMixed">
+                                Mixed (Balanced metabolism)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="metabolicType" id="metabolicFast" value="fast">
+                            <label class="form-check-label" for="metabolicFast">
+                                Fast (High carb tolerance)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="metabolicType" id="metabolicSlow" value="slow">
+                            <label class="form-check-label" for="metabolicSlow">
+                                Slow (Better with higher protein)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator me-2"></i>Calculate Nutrition
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Chat Panel (right side) -->
+            <div class="col-md-8 col-lg-9 chat-panel d-flex flex-column">
+                <!-- Nutrition Summary -->
+                <div id="nutritionSummary" class="nutrition-summary p-3 border-bottom" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Daily Calories</h5>
+                                    <div class="display-4 mb-2" id="summaryCalories">-</div>
+                                    <small class="text-muted">Based on your goals</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Macronutrients</h5>
+                                    <div class="row">
+                                        <div class="col-4 text-center">
+                                            <div class="macro-circle protein-bg">
+                                                <i class="fas fa-drumstick-bite"></i>
+                                            </div>
+                                            <h5 class="mt-2" id="summaryProtein">-</h5>
+                                            <small>Protein</small>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="macro-circle carbs-bg">
+                                                <i class="fas fa-bread-slice"></i>
+                                            </div>
+                                            <h5 class="mt-2" id="summaryCarbs">-</h5>
+                                            <small>Carbs</small>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="macro-circle fat-bg">
+                                                <i class="fas fa-cheese"></i>
+                                            </div>
+                                            <h5 class="mt-2" id="summaryFat">-</h5>
+                                            <small>Fat</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Container -->
+                <div id="chatContainer" class="chat-container p-3 flex-grow-1 overflow-auto">
+                    <div class="welcome-message">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>👋 Hello! I'm your AI Nutrition Assistant.</p>
+                                <p>To get started, please fill out your information in the form to the left. I'll calculate your personalized nutrition plan and provide advice tailored to your needs.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Message Input -->
+                <div class="message-input-container p-3 border-top">
+                    <form id="messageForm" class="needs-validation">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="messageInput" 
+                                class="form-control" 
+                                placeholder="Ask me about your nutrition plan..." 
+                                disabled
+                                required
+                            >
+                            <button class="btn btn-primary" type="submit" id="sendButton" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
