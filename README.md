@@ -95,7 +95,8 @@ nutrition-assistant/
 - `SESSION_SECRET`: Secret key for Flask sessions
 - `DATABASE_URL`: PostgreSQL connection string
 - `MONGODB_URI`: MongoDB connection string (optional)
-- `OPENAI_API_KEY`: OpenAI API key for chat responses
+- `GEMINI_API_KEY`: Google Gemini API key for chat responses (preferred)
+- `OPENAI_API_KEY`: OpenAI API key as alternative for chat responses
 
 ## Features in Detail
 

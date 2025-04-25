@@ -48,10 +48,24 @@ def create_local_env():
         # Create MongoDB URI
         mongodb_uri = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_host}:{mongo_port}/{mongo_db}"
     
-    # Get OpenAI API key
-    print("\nOpenAI API Setup:")
-    print("An OpenAI API key is required for the chatbot functionality.")
-    openai_key = getpass.getpass("Enter your OpenAI API key (or press Enter to skip): ")
+    # Get API keys for chat functionality
+    print("\nAI Chat Functionality Setup:")
+    print("You need an API key for the chatbot functionality.")
+    print("1. Google Gemini API (preferred)")
+    print("2. OpenAI API (alternative)")
+    api_choice = input("Which API would you like to use? (1/2, default is 1): ") or "1"
+    
+    gemini_key = None
+    openai_key = None
+    
+    if api_choice == "1":
+        print("\nGoogle Gemini API Setup:")
+        print("Get your API key from: https://makersuite.google.com/app/apikey")
+        gemini_key = getpass.getpass("Enter your Gemini API key: ")
+    else:
+        print("\nOpenAI API Setup:")
+        print("Get your API key from: https://platform.openai.com/api-keys")
+        openai_key = getpass.getpass("Enter your OpenAI API key: ")
     
     # Write to .env file
     with open(env_file, 'w') as f:
@@ -65,8 +79,10 @@ def create_local_env():
             f.write(f"# MongoDB Config\n")
             f.write(f"MONGODB_URI={mongodb_uri}\n\n")
         
+        f.write(f"# API Keys for AI Chat Functionality\n")
+        if gemini_key:
+            f.write(f"GEMINI_API_KEY={gemini_key}\n")
         if openai_key:
-            f.write(f"# OpenAI API Key\n")
             f.write(f"OPENAI_API_KEY={openai_key}\n")
     
     print(f"\n{env_file} created successfully!")

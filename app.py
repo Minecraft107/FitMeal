@@ -4,7 +4,8 @@ import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from utils import calculate_nutrition, get_openai_response
+from utils import calculate_nutrition
+from gemini_utils import get_gemini_response
 from database import init_db, db
 from mongo_db import init_mongodb, save_user, get_user_by_email
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -200,15 +201,15 @@ def save_user_profile():
 @app.route('/chat', methods=['POST'])
 @login_required
 def chat():
-    """Process chat messages and return AI responses."""
+    """Process chat messages and return AI responses using Google's Gemini API."""
     try:
         data = request.json
         message = data.get('message', '')
         nutrition_data = data.get('nutritionData', {})
         chat_history = data.get('chatHistory', [])
         
-        # Get AI response
-        response = get_openai_response(message, nutrition_data, chat_history)
+        # Get AI response from Gemini
+        response = get_gemini_response(message, nutrition_data, chat_history)
         
         return jsonify({'response': response})
     
