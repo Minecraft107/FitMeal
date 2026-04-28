@@ -8,26 +8,22 @@ body {
     overflow: hidden;
 }
 
-/* Form Panel */
 .form-panel {
     height: 100vh;
     overflow-y: auto;
     background-color: var(--bs-body-bg);
 }
 
-/* Chat Panel */
 .chat-panel {
     height: 100vh;
     background-color: var(--bs-body-bg);
 }
 
-/* Chat Container */
 .chat-container {
     overflow-y: auto;
     padding-bottom: 20px;
 }
 
-/* Messages */
 .message {
     display: flex;
     margin-bottom: 20px;
@@ -80,7 +76,6 @@ body {
     border-bottom-right-radius: 0;
 }
 
-/* Nutrition Summary */
 .nutrition-summary {
     background-color: var(--bs-body-bg);
 }
@@ -111,7 +106,7 @@ body {
     color: var(--fat-color);
 }
 
-/* Typing Indicator */
+
 .typing-indicator {
     display: flex;
     align-items: center;
@@ -148,12 +143,10 @@ body {
     }
 }
 
-/* Welcome Message */
 .welcome-message {
     padding: 20px 0;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
     .message {
         max-width: 90%;
