@@ -156,7 +156,7 @@
                     <i class="fas fa-apple-alt me-2"></i> NutriBot
                 </h3>
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm" title="Logout">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary btn-sm" title="Logout">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 {% endif %}
@@ -384,7 +384,7 @@
     window.fetch = function(url, options) {
         return originalFetch(url, options).then(response => {
             if (response.status === 401) {
-                window.location.href = "{{ url_for('login') }}";
+                window.location.href = "{{ url_for('auth.login') }}";
                 throw new Error('Redirecting to login...');
             }
             return response;

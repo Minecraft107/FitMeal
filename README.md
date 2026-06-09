@@ -104,25 +104,27 @@ Click **Create Web Service** — Render will build and deploy automatically.
 
 ```
 FitMeal/
-├── static/
-│   ├── css/custom.css
-│   └── js/script.js
-├── templates/
-│   ├── base.html
-│   ├── index.html
-│   ├── index_extended.html
-│   ├── login.html
-│   └── register.html
+├── app/
+│   ├── __init__.py              # App factory + extensions
+│   ├── auth.py                  # Auth blueprint (login/register/logout)
+│   ├── routes.py                # Main blueprint (index/calculate/chat)
+│   ├── models.py                # Data access layer (MongoDB + in-memory)
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── nutrition.py         # BMR/TDEE/macro calculation
+│   │   └── gemini.py            # Gemini AI chat integration
+│   ├── templates/               # Jinja2 templates
+│   │   ├── base.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   └── index_extended.html
+│   └── static/
+│       ├── css/custom.css
+│       └── js/script.js
+├── main.py                      # Entry point
 ├── .env.example
 ├── .gitignore
-├── app.py
-├── database.py
-├── gemini_utils.py
-├── local_setup.py
-├── main.py
-├── models.py
-├── mongo_db.py
+├── README.md
 ├── requirements.txt
-├── utils.py
 └── pyproject.toml
 ```
