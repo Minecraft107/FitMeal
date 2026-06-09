@@ -17,6 +17,31 @@
     {% block styles %}{% endblock %}
 </head>
 <body>
+    <nav class="navbar navbar-expand navbar-dark bg-dark border-bottom border-secondary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-apple-alt me-2"></i> NutriBot
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if current_user.is_authenticated %}
+                    <span class="nav-item nav-link text-light">
+                        <i class="fas fa-user me-1"></i>{{ current_user.full_name }}
+                    </span>
+                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                {% else %}
+                    <a class="nav-item nav-link" href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                    </a>
+                    <a class="nav-item nav-link" href="{{ url_for('register') }}">
+                        <i class="fas fa-user-plus me-1"></i> Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
     {% block content %}{% endblock %}
     
     <!-- Bootstrap JS Bundle -->

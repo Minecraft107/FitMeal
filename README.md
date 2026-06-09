@@ -1,122 +1,128 @@
-# AI Nutrition Assistant
+# AI Nutrition Assistant (FitMeal)
 
-An AI-powered nutrition assistant chatbot with personalized calorie and macronutrient calculations.
+An AI-powered nutrition assistant chatbot with user authentication and personalized calorie/macronutrient calculations.
 
 ## Features
 
-- User authentication system (login/registration)
-- Personalized nutrition calculations based on:
+- **User authentication** — register, login, session management (Flask-Login)
+- **Personalized nutrition calculations** based on:
   - Personal details (height, weight, age, gender)
-  - Activity level
-  - Fitness goals
-  - Diet preferences
-  - Metabolic type
-- Interactive chat interface with AI-powered responses
-- MongoDB storage for user profiles
-- PostgreSQL database for user accounts and chat history
+  - Activity level, fitness goals, diet preferences, metabolic type
+- **Interactive AI chat** powered by Google Gemini API
+- **MongoDB storage** for user profiles (local MongoDB or Atlas)
+- **In-memory fallback** — works without MongoDB
 
-## Setup Instructions for VS Code
+## Local Development
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- PostgreSQL database
-- MongoDB (optional, falls back to in-memory storage if not available)
-- OpenAI API key for chat functionality
+- Python 3.11+
+- MongoDB Compass or MongoDB Atlas (optional — falls back to in-memory)
 
-### Installation
+### Setup
 
-1. **Clone the repository or create a new folder** and copy all the files
+```bash
+# 1. Clone and enter the project
+cd FitMeal
 
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   ```
+# 2. Create & activate virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1        # Windows PowerShell
+# source .venv/bin/activate         # macOS/Linux
 
-3. **Activate the virtual environment**
-   - Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
+# 3. Install dependencies
+pip install -r requirements.txt
 
-4. **Install dependencies**
-   ```bash
-   pip install email-validator flask flask-login flask-sqlalchemy flask-wtf gunicorn openai psycopg2-binary pymongo
-   ```
+# 4. Create .env file
+cp .env.example .env
+# Edit .env with your settings (or run: python local_setup.py)
 
-5. **Set up environment variables**
-   - Create a `.env` file based on the provided `.env.example`
-   - Add your database connection strings and API keys
+# 5. Run the app
+python main.py
+```
 
-6. **Set up PostgreSQL database**
-   - Create a new database for the application
-   - Update the `DATABASE_URL` in your `.env` file
+Open **http://localhost:5000** — you'll be redirected to the login page.
 
-7. **Run the application**
-   ```bash
-   python main.py
-   ```
+### Environment Variables
 
-8. **Access the application**
-   - Open a web browser and go to `http://localhost:5000`
+| Variable | Required | Description |
+|---|---|---|
+| `SESSION_SECRET` | **Yes** | Flask session signing key |
+| `MONGODB_URI` | No | MongoDB connection string (omit for in-memory) |
+| `GEMINI_API_KEY` | No | Google Gemini API key for chat |
 
-## File Structure
+## Deploy to Render (GitHub Auto-Deploy)
+
+### 1. Push to GitHub
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/FitMeal.git
+git branch -M main
+git push -u origin main
+```
+
+### 2. Set up on Render
+
+1. Go to **https://dashboard.render.com** → **New +** → **Web Service**
+2. Connect your GitHub repository
+3. Configure:
+   - **Name**: `fitmeal`
+   - **Environment**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn --bind 0.0.0.0:5000 main:app`
+   - **Python Version**: 3.11
+
+### 3. Add Environment Variables in Render Dashboard
+
+| Key | Value |
+|---|---|
+| `SESSION_SECRET` | (generate a random hex string) |
+| `MONGODB_URI` | Your MongoDB Atlas connection string |
+| `GEMINI_API_KEY` | (optional) Your Gemini API key |
+
+### 4. Deploy
+
+Click **Create Web Service** — Render will build and deploy automatically.
+
+## MongoDB Setup
+
+### Local (MongoDB Compass)
+
+1. Install MongoDB Compass and run a local server
+2. Set `MONGODB_URI=mongodb://localhost:27017/fitmeal` in `.env`
+
+### Production (MongoDB Atlas — free tier)
+
+1. Create a free cluster at **https://cloud.mongodb.com**
+2. Create a database user, allow network access from everywhere (`0.0.0.0/0`)
+3. Get your connection string and set as `MONGODB_URI` on Render
+
+## Project Structure
 
 ```
-nutrition-assistant/
+FitMeal/
 ├── static/
-│   ├── css/
-│   │   └── custom.css
-│   └── js/
-│       └── script.js
+│   ├── css/custom.css
+│   └── js/script.js
 ├── templates/
 │   ├── base.html
 │   ├── index.html
 │   ├── index_extended.html
 │   ├── login.html
 │   └── register.html
-├── .env
 ├── .env.example
+├── .gitignore
 ├── app.py
 ├── database.py
+├── gemini_utils.py
+├── local_setup.py
 ├── main.py
 ├── models.py
 ├── mongo_db.py
-├── README.md
-└── utils.py
+├── requirements.txt
+├── utils.py
+└── pyproject.toml
 ```
-
-## Environment Variables
-
-- `SESSION_SECRET`: Secret key for Flask sessions
-- `DATABASE_URL`: PostgreSQL connection string
-- `MONGODB_URI`: MongoDB connection string (optional)
-- `GEMINI_API_KEY`: Google Gemini API key for chat responses (preferred)
-- `OPENAI_API_KEY`: OpenAI API key as alternative for chat responses
-
-## Features in Detail
-
-### User Authentication
-
-- Secure user registration and login
-- Password hashing for security
-- Session management with Flask-Login
-
-### Nutrition Calculation
-
-- BMR (Basal Metabolic Rate) calculation using the Mifflin-St Jeor Equation
-- TDEE (Total Daily Energy Expenditure) based on activity level
-- Macronutrient distribution based on:
-  - Diet type (balanced, high protein, keto, low fat, vegan)
-  - Metabolic type (fast, slow, mixed)
-  - Fitness goals (lose, maintain, gain)
-
-### Chat Interface
-
-- Interactive chat with AI-powered responses
-- Context-aware responses based on user's nutrition profile
-- Personalized nutrition advice

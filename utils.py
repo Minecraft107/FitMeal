@@ -1,10 +1,7 @@
 import os
 import json
 import logging
-from openai import OpenAI
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai = OpenAI(api_key=OPENAI_API_KEY)
 
 def calculate_bmr(weight, height, age, gender):
     """
@@ -202,66 +199,3 @@ def calculate_nutrition(height, weight, age, gender, activity_level, goal, diet_
     }
     
     return nutrition_data
-
-def get_openai_response(message, nutrition_data, chat_history):
-    """
-    Get AI response from OpenAI API.
-    
-    Args:
-        message (str): User message
-        nutrition_data (dict): User's nutrition data
-        chat_history (list): Previous chat messages
-        
-    Returns:
-        str: AI response
-    """
-    try:
-        # Prepare system message with nutrition data context
-        system_message = f"""
-        You are an AI nutrition assistant. Your goal is to provide helpful, personalized nutrition advice.
-        
-        USER'S NUTRITION DATA:
-        - Daily Calories: {nutrition_data.get('daily_calories', 'Not provided')} calories
-        - Protein: {nutrition_data.get('macros', {}).get('protein', 'Not provided')}g
-        - Carbohydrates: {nutrition_data.get('macros', {}).get('carbs', 'Not provided')}g
-        - Fat: {nutrition_data.get('macros', {}).get('fat', 'Not provided')}g
-        
-        USER INFO:
-        - Height: {nutrition_data.get('user_info', {}).get('height', 'Not provided')} cm
-        - Weight: {nutrition_data.get('user_info', {}).get('weight', 'Not provided')} kg
-        - Age: {nutrition_data.get('user_info', {}).get('age', 'Not provided')} years
-        - Gender: {nutrition_data.get('user_info', {}).get('gender', 'Not provided')}
-        - Activity Level: {nutrition_data.get('user_info', {}).get('activity_level', 'Not provided')}
-        - Goal: {nutrition_data.get('user_info', {}).get('goal', 'Not provided')}
-        - Diet Type: {nutrition_data.get('user_info', {}).get('diet_type', 'Not provided')}
-        - Metabolic Type: {nutrition_data.get('user_info', {}).get('metabolic_type', 'Not provided')}
-        
-        Provide concise, helpful advice based on this information. Focus on practical tips, meal ideas, 
-        and strategies that align with their goals and preferences. Avoid giving medical advice.
-        """
-        
-        # Prepare messages for the API call
-        messages = [{"role": "system", "content": system_message}]
-        
-        # Add chat history (limited to last 10 messages to stay within token limits)
-        for item in chat_history[-10:]:
-            role = "assistant" if item.get("isBot") else "user"
-            messages.append({"role": role, "content": item.get("message", "")})
-        
-        # Add current message
-        messages.append({"role": "user", "content": message})
-        
-        # Make OpenAI API call
-        response = openai.chat.completions.create(
-            model="gpt-4o",  # Using the latest model
-            messages=messages,
-            max_tokens=500,
-            temperature=0.7
-        )
-        
-        # Extract and return response
-        return response.choices[0].message.content
-    
-    except Exception as e:
-        logging.error(f"Error getting OpenAI response: {str(e)}")
-        return "I'm sorry, I'm having trouble processing your request at the moment. Please try again later."
