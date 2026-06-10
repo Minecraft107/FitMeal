@@ -25,14 +25,20 @@ def init_db():
         return
 
     try:
-        _client = MongoClient(uri)
+        _client = MongoClient(
+            uri,
+            tls=True,
+            tlsAllowInvalidCertificates=True,
+            serverSelectionTimeoutMS=10000
+        )
+        _client.admin.command('ping')
         _db = _client.fitmeal
         _profiles_coll = _db.users
         _auth_coll = _db.auth_users
         _profiles_coll.create_index([("email", pymongo.ASCENDING)], unique=True)
         _auth_coll.create_index([("username", pymongo.ASCENDING)], unique=True)
         _in_memory = False
-        logger.info("MongoDB connected")
+        logger.info("MongoDB connected successfully")
     except Exception as e:
         logger.error(f"MongoDB connection failed: {e} — falling back to in-memory")
         _in_memory = True
